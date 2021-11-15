@@ -1,0 +1,25 @@
+{
+    "name": "test-grupo-gcb",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/iranbrg/test-grupo-gcb.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/iranbrg/test-grupo-gcb/issues"
+    },
+    "homepage": "https://github.com/iranbrg/test-grupo-gcb#readme",
+    "devDependencies": {
+        "@types/node": "^16.11.7",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.4.4"
+    }
+}
