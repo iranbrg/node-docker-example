@@ -2,14 +2,15 @@
     "name": "test-grupo-gcb",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/index.js",
+    "main": "dist/server.js",
     "scripts": {
         "dev": "nodemon --exec ts-node src/server.ts --ignore __tests__/ --ignore prisma",
         "start": "node dist/server.js",
         "build": "rimraf ./dist && tsc",
         "lint": "eslint . --ext js,ts",
         "lint:fix": "eslint . --ext js,ts --fix",
-        "format": "prettier -w '**/*.{js,ts}' '!**/coverage/**'"
+        "format": "prettier -w '**/*.{js,ts}' '!**/coverage/**'",
+        "test": "jest"
     },
     "repository": {
         "type": "git",
@@ -22,9 +23,15 @@
         "url": "https://github.com/iranbrg/test-grupo-gcb/issues"
     },
     "homepage": "https://github.com/iranbrg/test-grupo-gcb#readme",
+    "dependencies": {
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1"
+    },
     "devDependencies": {
         "@types/express": "^4.17.13",
+        "@types/jest": "^27.0.2",
         "@types/node": "^16.11.7",
+        "@types/supertest": "^2.0.11",
         "@typescript-eslint/eslint-plugin": "^5.3.1",
         "@typescript-eslint/parser": "^5.3.1",
         "eslint": "^8.2.0",
@@ -33,14 +40,13 @@
         "eslint-import-resolver-typescript": "^2.5.0",
         "eslint-plugin-import": "^2.25.3",
         "eslint-plugin-prettier": "^4.0.0",
+        "jest": "^27.3.1",
         "nodemon": "^2.0.15",
         "prettier": "^2.4.1",
         "rimraf": "^3.0.2",
+        "supertest": "^6.1.6",
+        "ts-jest": "^27.0.7",
         "ts-node": "^10.4.0",
         "typescript": "^4.4.4"
-    },
-    "dependencies": {
-        "dotenv": "^10.0.0",
-        "express": "^4.17.1"
     }
 }
