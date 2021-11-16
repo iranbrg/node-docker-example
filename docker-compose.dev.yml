@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  gcb_node_app:
+    build:
+      context: .
+      target: dev
+    command: npm run dev
+    expose:
+      - "${PORT}"
+    ports:
+      - "3000:${PORT}"
+    volumes:
+      - /app/node_modules
+      - .:/app

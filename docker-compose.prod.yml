@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  gcb_node_app:
+    build:
+      context: .
+      target: prod
+    command: npm start
+    ports:
+      - "3000:${PORT}"
