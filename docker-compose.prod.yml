@@ -1,9 +1,8 @@
-version: "3"
+version: "3.9"
 
 services:
   gcb_node_app:
     build:
-      context: .
       target: prod
     command: npm start
     ports:
