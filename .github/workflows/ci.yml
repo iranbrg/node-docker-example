@@ -101,3 +101,4 @@ jobs:
     #       cd ~/app
     #       docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull gcb_node_app
     #       docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps gcb_node_app
+    #       npm run db:migrate:prod

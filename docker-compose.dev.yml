@@ -12,3 +12,7 @@ services:
     volumes:
       - /app/node_modules
       - .:/app
+
+  gcb_postgres:
+    ports:
+      - "5433:5432"
