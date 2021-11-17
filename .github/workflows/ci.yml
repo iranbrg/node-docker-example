@@ -1,0 +1,103 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, staging ]
+  pull_request:
+    branches: [ main, staging ]
+
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Cache dependencies
+      uses: actions/cache@v2.1.6
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node-
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Load environment variables for testing
+      run: cat .env.test >> $GITHUB_ENV
+
+    - name: Run tests
+      env:
+        NODE_ENV: ${{ env.NODE_ENV }}
+        POSTGRES_USER: ${{ env.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
+        POSTGRES_PORT: ${{ env.POSTGRES_PORT }}
+        POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB }}?schema=public
+      run: npm test
+
+    - name: Format
+      run: npm run format
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Deploy to Heroku (staging)
+      if: github.ref == 'refs/heads/staging'
+      uses: AkhileshNS/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+
+    - name: Run migrations (staging)
+      if: github.ref == 'refs/heads/staging'
+      run: heroku run npx prisma migrate deploy -a ${{ secrets.HEROKU_APP_NAME }}
+
+    - name: Login to Docker Hub
+      if: github.ref == 'refs/heads/main'
+      run: docker login --username=${{ secrets.DOCKER_HUB_USERNAME }} --password=${{ secrets.DOCKER_HUB_PASSWORD }}
+
+    - name: Build Node.js Docker image
+      if: github.ref == 'refs/heads/main'
+      run: docker-compose -f docker-compose.yml -f docker-compose.prod.yml build gcb_node_app
+
+    - name: Push Node.js image to Docker Hub
+      if: github.ref == 'refs/heads/main'
+      run: docker-compose -f docker-compose.yml -f docker-compose.prod.yml push gcb_node_app
+
+    # - name: Copy files to Digital Ocean server
+    #   if: github.ref == 'refs/heads/main'
+    #   uses: appleboy/scp-action@master
+    #   with:
+    #     host: ${{ secrets.DO_SSH_HOST }}
+    #     username: ${{ secrets.DO_SSH_USER }}
+    #     key: ${{ secrets.DO_SSH_KEY }}
+    #     port: ${{ secrets.DO_SSH_PORT }}
+    #     source: "docker-compose.yml,docker-compose.prod.yml"
+    #     target: "~/app"
+
+    # - name: Deploy to Digital Ocean
+    #   if: github.ref == 'refs/heads/main'
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.DO_SSH_HOST }}
+    #     username: ${{ secrets.DO_SSH_USER }}
+    #     key: ${{ secrets.DO_SSH_KEY }}
+    #     port: ${{ secrets.DO_SSH_PORT }}
+    #     script: |
+    #       cd ~/app
+    #       docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull gcb_node_app
+    #       docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps gcb_node_app
