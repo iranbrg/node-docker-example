@@ -9,6 +9,8 @@ RUN npm install
 COPY prisma/schema.prisma ./prisma/
 RUN npx prisma generate
 
+# RUN chown -Rh node:node node_modules
+
 COPY src ./src
 
 # Build stage
